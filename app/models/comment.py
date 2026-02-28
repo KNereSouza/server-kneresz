@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy import ForeignKey, Index, Text, func
 from sqlalchemy.dialects.postgresql import TIMESTAMP, UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
@@ -25,6 +25,8 @@ class Comment(Base):
     )
     body: Mapped[str] = mapped_column(Text, nullable=False)
     deleted_at = mapped_column(TIMESTAMP(timezone=True), nullable=True)
+
+    user = relationship("User", lazy="raise")
     created_at = mapped_column(
         TIMESTAMP(timezone=True), server_default=func.now()
     )
