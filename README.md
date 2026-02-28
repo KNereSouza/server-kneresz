@@ -95,7 +95,7 @@ All endpoints are prefixed at the root (`/`).
 
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| `GET` | `/posts` | -- | List posts (query: `tag`, `status`, `offset`, `limit`) |
+| `GET` | `/posts` | -- | List posts (query: `tag`, `status`, `offset`, `limit`, `include_deleted`) |
 | `GET` | `/posts/{slug}` | -- | Get post by slug (301 redirect on old slugs) |
 | `POST` | `/posts` | Admin | Create post |
 | `PUT` | `/posts/{slug}` | Admin | Update post |
