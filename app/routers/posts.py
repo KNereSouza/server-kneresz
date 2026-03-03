@@ -15,13 +15,13 @@ router = APIRouter(prefix="/posts", tags=["posts"])
 async def list_posts(
     offset: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
-    tag: str | None = None,
+    tag: list[str] | None = Query(None),
     status: str | None = None,
     include_deleted: bool = Query(False),
     db: AsyncSession = Depends(get_db),
 ):
     items, total = await posts_service.list_posts(
-        db, offset=offset, limit=limit, tag=tag, status_filter=status,
+        db, offset=offset, limit=limit, tags=tag, status_filter=status,
         include_deleted=include_deleted,
     )
     return PostList(items=items, total=total)

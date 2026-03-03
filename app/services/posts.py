@@ -17,7 +17,7 @@ async def list_posts(
     db: AsyncSession,
     offset: int = 0,
     limit: int = 50,
-    tag: str | None = None,
+    tags: list[str] | None = None,
     status_filter: str | None = None,
     include_deleted: bool = False,
 ) -> tuple[list[Post], int]:
@@ -28,9 +28,9 @@ async def list_posts(
         query = query.where(Post.deleted_at.is_(None))
         count_query = count_query.where(Post.deleted_at.is_(None))
 
-    if tag:
-        query = query.where(Post.tags.contains([tag]))
-        count_query = count_query.where(Post.tags.contains([tag]))
+    if tags:
+        query = query.where(Post.tags.overlap(tags))
+        count_query = count_query.where(Post.tags.overlap(tags))
 
     if status_filter:
         query = query.where(Post.status == status_filter)
