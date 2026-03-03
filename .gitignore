@@ -12,5 +12,8 @@ wheels/
 # Environment
 .env
 
+# SSL certificates
+nginx/ssl/
+
 # IDE
 .vscode/
