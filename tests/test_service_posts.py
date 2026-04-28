@@ -67,10 +67,10 @@ async def test_list_posts_filter_by_tag(db):
         db, {"title": "Both", "body": "C", "tags": ["python", "rust"]}
     )
 
-    items, total = await list_posts(db, tag="python")
+    items, total = await list_posts(db, tags=["python"])
     assert total == 2
 
-    items, total = await list_posts(db, tag="rust")
+    items, total = await list_posts(db, tags=["rust"])
     assert total == 2
 
 

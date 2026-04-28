@@ -78,7 +78,7 @@ async def garbage_collect(db: AsyncSession) -> tuple[int, list[uuid.UUID]]:
     posts_result = await db.execute(select(Post.body))
     referenced_urls: set[str] = set()
     for (body,) in posts_result:
-        referenced_urls.update(re.findall(r'https?://\S+', body))
+        referenced_urls.update(re.findall(r'https?://[^\s<>"\'()]+', body))
 
     # Find media not referenced by any post
     all_media = await db.execute(select(Media))

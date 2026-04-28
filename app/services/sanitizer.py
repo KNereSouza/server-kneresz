@@ -1,4 +1,5 @@
 import bleach
+from bleach.linkifier import Linker
 
 ALLOWED_TAGS = [
     "a", "abbr", "b", "blockquote", "br", "code", "del",
@@ -8,15 +9,23 @@ ALLOWED_TAGS = [
 ]
 
 ALLOWED_ATTRIBUTES = {
-    "a": ["href", "title"],
+    "a": ["href", "title", "rel", "target"],
     "img": ["src", "alt", "title"],
 }
 
 
+def _set_link_safety(attrs: dict, new: bool = False) -> dict:
+    attrs[(None, "target")] = "_blank"
+    attrs[(None, "rel")] = "noopener noreferrer"
+    return attrs
+
+
 def sanitize_markdown(body: str) -> str:
-    return bleach.clean(
+    cleaned = bleach.clean(
         body,
         tags=ALLOWED_TAGS,
         attributes=ALLOWED_ATTRIBUTES,
         strip=True,
     )
+    linker = Linker(callbacks=[_set_link_safety], skip_tags=["pre", "code"])
+    return linker.linkify(cleaned)

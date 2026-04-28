@@ -1,7 +1,13 @@
 import uuid
 from datetime import datetime
+from enum import Enum
 
 from pydantic import BaseModel
+
+
+class PostStatus(str, Enum):
+    draft = "draft"
+    published = "published"
 
 
 class PostCreate(BaseModel):
@@ -14,7 +20,7 @@ class PostUpdate(BaseModel):
     title: str | None = None
     body: str | None = None
     tags: list[str] | None = None
-    status: str | None = None
+    status: PostStatus | None = None
 
 
 class PostOut(BaseModel):
@@ -23,7 +29,7 @@ class PostOut(BaseModel):
     slug: str
     body: str
     tags: list[str]
-    status: str
+    status: PostStatus
     deleted_at: datetime | None
     created_at: datetime
     updated_at: datetime

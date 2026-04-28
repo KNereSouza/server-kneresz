@@ -1,19 +1,16 @@
 import uuid
 
 from fastapi import APIRouter, Depends
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from app.config import settings
-from app.dependencies import get_current_user, get_db, require_admin
+from app.dependencies import get_current_user, get_db, is_admin_user, require_admin
 from app.models.user import User
+from app.rate_limit import limiter
 from app.schemas.comment import CommentCreate, CommentOut
 from app.services import comments as comments_service
 
 router = APIRouter(tags=["comments"])
-limiter = Limiter(key_func=get_remote_address)
 
 
 @router.get("/posts/{slug}/comments", response_model=list[CommentOut])
@@ -43,8 +40,9 @@ async def soft_delete_comment(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    is_admin = user.github_id == settings.ADMIN_GITHUB_ID
-    return await comments_service.soft_delete_comment(db, comment_id, user.id, is_admin)
+    return await comments_service.soft_delete_comment(
+        db, comment_id, user.id, is_admin_user(user)
+    )
 
 
 @router.post("/comments/{comment_id}/restore", response_model=CommentOut)

@@ -134,13 +134,24 @@ async def client(override_get_db) -> AsyncGenerator[AsyncClient]:
 
 @pytest.fixture
 async def sample_post(db: AsyncSession) -> Post:
-    from app.services.posts import create_post
+    from app.services.posts import create_post, update_post
 
-    return await create_post(
+    post = await create_post(
         db,
         {
             "title": "Test Post Title",
             "body": "Body with https://example.com/media.png link.",
             "tags": ["python", "testing"],
         },
+    )
+    return await update_post(db, post.slug, {"status": "published"})
+
+
+@pytest.fixture
+async def draft_post(db: AsyncSession) -> Post:
+    from app.services.posts import create_post
+
+    return await create_post(
+        db,
+        {"title": "Draft Only", "body": "Secret draft", "tags": []},
     )

@@ -12,6 +12,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 security = HTTPBearer()
+security_optional = HTTPBearer(auto_error=False)
+
+
+def is_admin_user(user: User | None) -> bool:
+    return user is not None and user.github_id == settings.ADMIN_GITHUB_ID
 
 
 async def get_db() -> AsyncGenerator[AsyncSession]:
@@ -34,7 +39,20 @@ async def get_current_user(
     return user
 
 
+async def get_current_user_optional(
+    credentials: HTTPAuthorizationCredentials | None = Depends(security_optional),
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    if credentials is None:
+        return None
+    user_id = verify_token(credentials.credentials)
+    if user_id is None:
+        return None
+    result = await db.execute(select(User).where(User.id == user_id))
+    return result.scalar_one_or_none()
+
+
 async def require_admin(user: User = Depends(get_current_user)) -> User:
-    if user.github_id != settings.ADMIN_GITHUB_ID:
+    if not is_admin_user(user):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
     return user

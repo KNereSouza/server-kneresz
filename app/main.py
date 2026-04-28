@@ -7,8 +7,8 @@ from slowapi.errors import RateLimitExceeded
 
 from app.config import settings
 from app.database import engine
+from app.rate_limit import limiter
 from app.routers import auth, comments, media, posts
-from app.routers.comments import limiter
 
 
 @asynccontextmanager
@@ -26,8 +26,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 app.include_router(auth.router)

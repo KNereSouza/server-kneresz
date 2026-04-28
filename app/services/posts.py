@@ -143,7 +143,7 @@ async def purge_post(db: AsyncSession, slug: str) -> None:
 
     # Find media URLs referenced in the post body
     from app.utils.r2 import get_r2_client
-    media_urls = set(re.findall(r'https?://\S+', post.body))
+    media_urls = set(re.findall(r'https?://[^\s<>"\'()]+', post.body))
     media_result = await db.execute(
         select(Media).where(Media.url.in_(media_urls))
     )

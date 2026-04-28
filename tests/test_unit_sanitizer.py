@@ -22,7 +22,22 @@ def test_sanitize_strips_onclick():
 
 def test_sanitize_allows_links_with_href():
     html = '<a href="https://example.com" title="link">click</a>'
-    assert sanitize_markdown(html) == html
+    result = sanitize_markdown(html)
+    assert 'href="https://example.com"' in result
+    assert 'target="_blank"' in result
+    assert 'rel="noopener noreferrer"' in result
+
+
+def test_sanitize_linkifies_plain_urls_with_safe_attrs():
+    result = sanitize_markdown("see https://example.com for more")
+    assert 'href="https://example.com"' in result
+    assert 'target="_blank"' in result
+    assert 'rel="noopener noreferrer"' in result
+
+
+def test_sanitize_does_not_linkify_inside_code():
+    result = sanitize_markdown("<code>https://example.com</code>")
+    assert "<a " not in result
 
 
 def test_sanitize_allows_img_with_src_alt():

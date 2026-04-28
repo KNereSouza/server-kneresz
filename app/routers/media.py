@@ -2,9 +2,11 @@ import uuid
 
 from fastapi import APIRouter, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.requests import Request
 
 from app.dependencies import get_db, require_admin
 from app.models.user import User
+from app.rate_limit import limiter
 from app.schemas.media import GCResponse, MediaOut
 from app.services import media as media_service
 
@@ -12,7 +14,9 @@ router = APIRouter(tags=["media"])
 
 
 @router.post("/media", response_model=MediaOut, status_code=201)
+@limiter.limit("30/minute")
 async def upload_media(
+    request: Request,
     file: UploadFile,
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
